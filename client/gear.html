@@ -187,19 +187,22 @@
       <!-- shopping cart start-->
       <div class="modal">
          <div class="modal-container js-modal">
-             <div class="modal-close js-close-btn">
-                 <i class="fa-solid fa-xmark"></i>
-             </div>
-             <header class="modal-header">
-                 <i class="fa fa-shopping-cart"></i>
-                 Cart
-             </header>
-             <div id="cart_details">
-             </div>
-             <button id="cart_btn" type="button">Pay</button>
+            <div class="modal-close js-close-btn">
+               <i class="fa-solid fa-xmark"></i>
+            </div>
+            <header class="modal-header">
+               <i class="fa fa-shopping-cart"></i>
+               Cart
+            </header>
+            <div class="row">
+               <div id="cart_details" class="col-md-8">
+               </div>
+               <div class="col-md-4" id="total_value">Total: $</div>
+            </div>
+            <button id="cart_btn" type="button">Pay</button>
          </div>
       </div>
-     <!-- end shopping cart -->
+      <!-- end shopping cart -->
       <!-- Javascript files-->
       <script src="./assets/js/jquery.min.js"></script>
       <script src="./assets/js/popper.min.js"></script>

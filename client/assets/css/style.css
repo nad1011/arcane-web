@@ -1045,7 +1045,7 @@ ul.location_icon li a {
 }
 
 .hidden {
-     display: none;
+     display: none !important;
 }
 
 .modal {
@@ -1146,7 +1146,7 @@ ul.location_icon li a {
      font-weight: bold;
      font-style:italic;
      font-size: 28px;
-
+     padding-left: 0 !important;
 }
 .cart_detail--container {
      display:flex;

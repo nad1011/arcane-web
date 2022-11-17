@@ -75,7 +75,14 @@ app.post('/cart', (req,res)=>{
 //update
 
 //delete
-
+app.delete('/deleteCart/:id', (request, response) => {
+    const { id } = request.params;
+    const db = dbService.getDbServiceInstance();
+    const result = db.deleteRowById(id);
+    result
+    .then(data => response.json({success : data}))
+    .catch(err => console.log(err));
+});
 //open
 app.listen(5000, ()=>{
     console.log('Server is open at: http://localhost:5000');

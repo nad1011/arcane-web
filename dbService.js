@@ -189,14 +189,13 @@ class DbService {
         try {
             id = parseInt(id, 10); 
             const response = await new Promise((resolve, reject) => {
-                const query = "DELETE FROM names WHERE id = ?";
+                const query = "DELETE FROM cart WHERE cartID = ?";
     
                 connection.query(query, [id] , (err, result) => {
                     if (err) reject(new Error(err.message));
-                    resolve(result.affectedRows);
+                    resolve(1);
                 })
             });
-    
             return response === 1 ? true : false;
         } catch (error) {
             console.log(error);

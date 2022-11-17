@@ -163,10 +163,25 @@ cartBtn.onclick = function() {
                     <span class="cart_details--amount">Amount: ${cartAmount}</span>
                     <span class="cart_details--price">Price: ${cartPrice}</span>
                     <span class="cart_details--id hidden">${cartID}</span>
-                    <button type="button" class="delete_from_cart">Delete</button>
+                    <button type="button" class="delete_from_cart" id="open_cart">Delete</button>
                 </div>`;
                 setData('total_value',parseInt(window.localStorage.getItem('total_value')) + parseInt(cartPrice));
                 document.querySelector('#total_value').innerHTML = `Total: $${window.localStorage.getItem('total_value')}`;
+                document.querySelectorAll(".delete_from_cart").forEach(e=>{
+                    e.onclick = function() {
+                        fetch('http://localhost:5000/deleteCart/' + e.parentElement.querySelector('.cart_details--id').innerHTML, {
+                        method: 'DELETE',
+                        })
+                        .then(res => res.json())
+                        .then(data => {
+                            if (data.success) {
+                                e.parentElement.classList.add('hidden');
+                                setData('total_value',parseInt(window.localStorage.getItem('total_value')) - parseInt(e.parentElement.querySelector('.cart_details--price').innerHTML.slice(7)));
+                                document.querySelector('#total_value').innerHTML = `Total: $${window.localStorage.getItem('total_value')}`;
+                            } 
+                        })
+                    }
+                })
             })
             
         }
