@@ -51,17 +51,13 @@ class DbService {
         }
     }
 
-    async getAllCart(username) {
+    async getAllCart(code) {
         try {
             const response = await new Promise((resolve, reject) => {
-                const query1 = "SELECT * FROM user_infor WHERE username = ?"
-                connection.query(query1, [username] , (err, result) => {
+                const query = "SELECT * FROM cart WHERE lading_code = ?;";
+                connection.query(query, [code] ,(err, results) => {
                     if (err) reject(new Error(err.message));
-                    const query = "SELECT * FROM cart WHERE userID = ?;";
-                    connection.query(query, [result[0]['id']] ,(err, results) => {
-                        if (err) reject(new Error(err.message));
-                        resolve(results);
-                    })
+                    resolve(results);
                 })
             });
             return response;
@@ -70,7 +66,7 @@ class DbService {
         }
     }
 
-    async insertNewUser(username,email,password) {
+    async insertNewUser(username,email,password,lading_code) {
         try {
             const insertId = await new Promise((resolve, reject) => {
                 const query1 = "SELECT * FROM user_infor WHERE username = ?"
@@ -79,8 +75,8 @@ class DbService {
                     if (Object.keys(result).length != 0) {
                         resolve(-1);
                     } else {
-                        const query2 = "INSERT INTO user_infor (username, email, password) VALUES (?,?,?);";
-                        connection.query(query2, [username,email,password] , (err1, result1) => {
+                        const query2 = "INSERT INTO user_infor (username, email, password, user_lading_code) VALUES (?,?,?,?);";
+                        connection.query(query2, [username,email,password,lading_code] , (err1, result1) => {
                             if (err1) reject(new Error(err1.message));
                             resolve(result1.id);
                         })
@@ -122,7 +118,7 @@ class DbService {
 
     async userLogin(username,password) {
         try {
-            const insertId = await new Promise((resolve, reject) => {
+            const code = await new Promise((resolve, reject) => {
                 const query = "SELECT * FROM user_infor WHERE username = ?";
                 connection.query(query, [username] , (err, result) => {
                     if (err) reject(new Error(err.message));
@@ -131,13 +127,13 @@ class DbService {
                     }
                     else {
                         if (result[0].password != password) resolve(-1);
-                        else resolve(result.id);
+                        else resolve(result[0].user_lading_code);
                     }
                 })
             });
-            if (insertId == -1) return null; 
+            if (code == -1) return null; 
             else return {
-                id : insertId,
+                code : code,
                 username : username,
                 password : password
             };
@@ -146,34 +142,25 @@ class DbService {
         }
     }
 
-    async insertNewCart(name, amount, price, username) {
+    async insertNewCart(name, amount, price, username, code) {
         try {
             const insertId = await new Promise((resolve, reject) => {
-                const query1 = "SELECT MAX(orderID) FROM cart";
-                var orderID;
+                var lading_code = code;
                 var userID;
                 var productID;
-                connection.query(query1, (err, result) => {
-                    if (err) reject(new Error(err.message));
-                    if (result[0]['MAX(orderID)']==null) {
-                        orderID = 1;
-                    } else {
-                        orderID = result[0]['MAX(orderID)'];
-                    }
-                    const query2 = "SELECT * FROM user_infor WHERE username = ?"
-                    connection.query(query2, [username] , (err1, result1) => {
-                        if (err1) reject(new Error(err1.message));
-                        userID = result1[0]['id'];
-                    })
-                    const query3 = "SELECT * FROM product WHERE name = ?"
-                    connection.query(query3, [name] , (err2, result2) => {
-                        if (err2) reject(new Error(err2.message));
-                        productID = result2[0]['id'];
-                        const query4 = "INSERT INTO cart (orderID, userID, productID, amount, price) VALUES (?,?,?,?,?);";
-                        connection.query(query4, [orderID,userID,productID,amount,price] , (err3, result3) => {
-                            if (err3) reject(new Error(err3.message));
-                            resolve(result3.cartID);
-                        })
+                const query2 = "SELECT * FROM user_infor WHERE username = ?"
+                connection.query(query2, [username] , (err1, result1) => {
+                    if (err1) reject(new Error(err1.message));
+                    userID = result1[0]['id'];
+                })
+                const query3 = "SELECT * FROM product WHERE name = ?"
+                connection.query(query3, [name] , (err2, result2) => {
+                    if (err2) reject(new Error(err2.message));
+                    productID = result2[0]['id'];
+                    const query4 = "INSERT INTO cart (lading_code, userID, productID, amount, price) VALUES (?,?,?,?,?);";
+                    connection.query(query4, [lading_code,userID,productID,amount,price] , (err3, result3) => {
+                        if (err3) reject(new Error(err3.message));
+                        resolve(result3.cartID);
                     })
                 })
             });

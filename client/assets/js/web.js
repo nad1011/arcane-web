@@ -24,6 +24,7 @@ function clearInputError(inputElement) {
 //submit
 const submitLogin = document.querySelector('#login_button');
 const submitRegister = document.querySelector('#register_button');
+
 submitLogin.onclick = function() {
     const username = document.querySelector('#login_username').value;
     const password = document.querySelector('#login_password').value;
@@ -45,6 +46,7 @@ submitLogin.onclick = function() {
         }
         else {
             setData('username',username);
+            setData(username,data.data.code);
             window.location.href = 'sus.html';
         }
     })
@@ -54,7 +56,7 @@ submitRegister.onclick = function() {
     const email = document.querySelector('#email').value;
     const password = document.querySelector('#password').value;
     const cf_password = document.querySelector('#confirmPass').value;
-    
+    const lading_code = Math.random().toString(36).slice(2, 12);
     if (password != cf_password) {
         setError(document.querySelector("#register--error"), "Please make sure your password match!");
     } else {
@@ -66,7 +68,8 @@ submitRegister.onclick = function() {
             body: JSON.stringify({
                 username : username,
                 email: email,
-                password : password
+                password : password,
+                lading_code : lading_code
             })
         })
         .then(response => response.json())
@@ -76,6 +79,7 @@ submitRegister.onclick = function() {
             }
             else {
                 setData('username',username);
+                setData(username,lading_code);
                 window.location.href = 'sus.html';
             }
         })

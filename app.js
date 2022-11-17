@@ -42,32 +42,32 @@ app.post('/login', (req,res)=>{
 });
 app.post('/register', (req,res)=>{
     const db = dbService.getDbServiceInstance();
-    const { username, email, password } = req.body;
-    const result = db.insertNewUser(username,email, password);
+    const { username, email, password, lading_code } = req.body;
+    const result = db.insertNewUser(username,email, password, lading_code);
     result
     .then(data => res.json({ data: data}))
     .catch(err => console.log(err));
 });
 app.post('/sell', (req,res)=>{
     const db = dbService.getDbServiceInstance();
-    const { name, price, image, sellerUsername } = req.body;
-    const result = db.insertNewProduct(name, price, image, sellerUsername);
+    const { name, price, image, sellerUsername, quantity } = req.body;
+    const result = db.insertNewProduct(name, price, image, sellerUsername, quantity);
     result
     .then(data => res.json({ data: data}))
     .catch(err => console.log(err));
 });
 app.post('/send', (req,res)=>{
     const db = dbService.getDbServiceInstance();
-    const { name, amount, price, username } = req.body;
-    const result = db.insertNewCart(name, amount, price, username);
+    const { name, amount, price, username, code } = req.body;
+    const result = db.insertNewCart(name, amount, price, username, code);
     result
     .then(data => res.json({ data: data}))
     .catch(err => console.log(err));
 });
 app.post('/cart', (req,res)=>{
     const db = dbService.getDbServiceInstance();
-    const { username } = req.body;
-    const result = db.getAllCart(username);
+    const { code } = req.body;
+    const result = db.getAllCart(code);
     result
     .then(data => res.json({ data: data}))
     .catch(err => console.log(err));

@@ -29,8 +29,8 @@ document.addEventListener("DOMContentLoaded", () => {
                         <form class="form" id="buy">
                             <p>${name}</p>
                             <div class="amount__input-group">
-                                <span>Amount:</span>
-                                <input class="range" type="range" value="0" min="0" max="${amount * 10}" onChange="rangeSlide(this.value,${i},${price})" onmousemove="rangeSlide(this.value,${i},${price})"></input>
+                                <span>   Amount:</span>
+                                <input class="range" type="range" value="0" min="0" max="${amount*10}" onChange="rangeSlide(this.value,${i},${price})" onmousemove="rangeSlide(this.value,${i},${price})"></input>
                                 <span id="rangeValue${i}">0</span>
                             </div>
                             <div id="total_price${i}" class="total--price">Total price: $0</div>
@@ -70,7 +70,8 @@ document.addEventListener("DOMContentLoaded", () => {
                         name: e.parentElement.querySelector('p').innerText,
                         amount: Math.round(e.parentElement.querySelector('.range').value/10),
                         price: e.parentElement.querySelector('.total--price').innerHTML.slice(14),
-                        username: window.localStorage.getItem('username')
+                        username: window.localStorage.getItem('username'),
+                        code: window.localStorage.getItem(window.localStorage.getItem('username'))
                     })
                 })
             }
@@ -133,7 +134,7 @@ cartBtn.onclick = function() {
         },
         method: 'POST',
         body: JSON.stringify({
-            username: window.localStorage.getItem('username')
+            code: window.localStorage.getItem(window.localStorage.getItem('username'))
         })
     })
     .then(response => response.json())
@@ -202,3 +203,9 @@ modal.addEventListener('click', closeBuyTickets);
 modalSelector.addEventListener('click', function (event){
     event.stopPropagation();
 })
+
+// pay section
+const payBtn = document.querySelector('#cart_btn');
+payBtn.onclick = function() {
+    
+}
