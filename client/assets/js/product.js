@@ -183,8 +183,30 @@ cartBtn.onclick = function() {
                         })
                     }
                 })
+                const payBtn = document.querySelector('#cart_btn');
+                payBtn.onclick = function() {
+                    var currentDate = new Date();
+                    var dateTimeText = `${currentDate.getFullYear()}-${currentDate.getMonth() + 1}-${currentDate.getDate()} ${currentDate.getHours()}:${currentDate.getMinutes()}:${currentDate.getSeconds()}`;
+                    fetch('http://localhost:5000/pay', {
+                        headers: {
+                            'Content-type': 'application/json'
+                        },
+                        method: 'POST',
+                        body: JSON.stringify({
+                            username:  window.localStorage.getItem('username'),
+                            lading_code: window.localStorage.getItem(window.localStorage.getItem('username')),
+                            total_price: window.localStorage.getItem('total_value'),
+                            date_time: dateTimeText
+                        })
+                    })
+                    .then(res => res.json())
+                    .then(data => {
+                        setData(window.localStorage.getItem('username'),Math.random().toString(36).slice(2, 12));
+                        alert("Your order will be delivered quickly");
+                        location.reload()
+                    })
+                }
             })
-            
         }
     })
 }
@@ -203,9 +225,3 @@ modal.addEventListener('click', closeBuyTickets);
 modalSelector.addEventListener('click', function (event){
     event.stopPropagation();
 })
-
-// pay section
-const payBtn = document.querySelector('#cart_btn');
-payBtn.onclick = function() {
-    
-}

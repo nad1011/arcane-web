@@ -66,6 +66,48 @@ class DbService {
         }
     }
 
+    async pay(username,lading_code,total_price,date_time) {
+        try {
+            const response = await new Promise((resolve, reject) => {
+                //take userID
+                const query = "SELECT * FROM user_infor WHERE username = ?"
+                connection.query(query, [username] , (err, res) => {
+                    if (err) reject(new Error(err.message));
+                    const query1 = "SELECT * FROM cart WHERE lading_code = ?"
+                    connection.query(query1, [lading_code] , (err1, res1) => {
+                        if (err1) reject(new Error(err1.message));
+                        for (var index of res1) {
+                            const queryPrd = "SELECT * FROM product WHERE id = ?";
+                            connection.query(queryPrd,[index.productID],(errPrd,resPrd)=>{
+                                if (errPrd) reject1(new Error(errPrd.message));
+                                if (resPrd[0].quantity < index.amount) {
+                                    resolve(-1);
+                                }
+                                else {
+                                    const queryUpdate = "UPDATE product SET quantity = ? WHERE id = ?";
+                                    connection.query(queryUpdate,[parseInt(resPrd[0].quantity)-parseInt(index.amount),index.productID],(errUpd,resUpd)=>{
+                                        if (errUpd) reject1(new Error(errUpd.message));
+                                        //resolve(1);
+                                    })
+                                }
+                            })
+                        }
+                        const queryPay = "INSERT INTO user_order (recipientID, lading_code, total_price, date_time) VALUES (?,?,?,?);";
+                        connection.query(queryPay, [res[0].id,lading_code,total_price,date_time] , (errPay, resultPay) => {
+                            if (errPay) reject(new Error(errPay.message));
+                            resolve(resultPay.id);
+                        })
+                    })
+                })
+            });
+
+            return response;
+            
+        } catch (error) {
+            console.log(error);
+        }
+    }
+
     async insertNewUser(username,email,password,lading_code) {
         try {
             const insertId = await new Promise((resolve, reject) => {

@@ -72,6 +72,14 @@ app.post('/cart', (req,res)=>{
     .then(data => res.json({ data: data}))
     .catch(err => console.log(err));
 });
+app.post('/pay', (req,res)=>{
+    const db = dbService.getDbServiceInstance();
+    const { username,lading_code,total_price,date_time } = req.body;
+    const result = db.pay(username,lading_code,total_price,date_time);
+    result
+    .then(data => res.json({ data: data}))
+    .catch(err => console.log(err));
+});
 //update
 
 //delete
