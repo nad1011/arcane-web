@@ -84,6 +84,12 @@ class DbService {
                                     resolve(-1);
                                 }
                                 else {
+                                    if (resPrd[0].quantity == index.amount) {
+                                        const queryDelete = "DELETE FROM product WHERE id = ?";
+                                        connection.query(queryDelete, [index.productID] , (errabc, resultabc) => {
+                                            if (errabc) reject(new Error(errabc.message));
+                                        })
+                                    }
                                     const queryUpdate = "UPDATE product SET quantity = ? WHERE id = ?";
                                     connection.query(queryUpdate,[parseInt(resPrd[0].quantity)-parseInt(index.amount),index.productID],(errUpd,resUpd)=>{
                                         if (errUpd) reject1(new Error(errUpd.message));
