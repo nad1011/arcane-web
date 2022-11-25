@@ -24,7 +24,7 @@ class DbService {
     async getAllProduct() {
         try {
             const response = await new Promise((resolve, reject) => {
-                const query = "SELECT * FROM product;";
+                const query = "SELECT * FROM product WHERE quantity != 0;";
                 connection.query(query, (err, results) => {
                     if (err) reject(new Error(err.message));
                     resolve(results);
@@ -79,20 +79,15 @@ class DbService {
                         for (var index of res1) {
                             const queryPrd = "SELECT * FROM product WHERE id = ?";
                             connection.query(queryPrd,[index.productID],(errPrd,resPrd)=>{
-                                if (errPrd) reject1(new Error(errPrd.message));
+                                if (errPrd) reject(new Error(errPrd.message));
                                 if (resPrd[0].quantity < index.amount) {
                                     resolve(-1);
+                                    reject();
                                 }
-                                else {
-                                    if (resPrd[0].quantity == index.amount) {
-                                        const queryDelete = "DELETE FROM product WHERE id = ?";
-                                        connection.query(queryDelete, [index.productID] , (errabc, resultabc) => {
-                                            if (errabc) reject(new Error(errabc.message));
-                                        })
-                                    }
+                                else { 
                                     const queryUpdate = "UPDATE product SET quantity = ? WHERE id = ?";
                                     connection.query(queryUpdate,[parseInt(resPrd[0].quantity)-parseInt(index.amount),index.productID],(errUpd,resUpd)=>{
-                                        if (errUpd) reject1(new Error(errUpd.message));
+                                        if (errUpd) reject(new Error(errUpd.message));
                                         //resolve(1);
                                     })
                                 }
@@ -101,7 +96,7 @@ class DbService {
                         const queryPay = "INSERT INTO user_order (recipientID, lading_code, total_price, date_time) VALUES (?,?,?,?);";
                         connection.query(queryPay, [res[0].id,lading_code,total_price,date_time] , (errPay, resultPay) => {
                             if (errPay) reject(new Error(errPay.message));
-                            resolve(resultPay.id);
+                            resolve(resultPay.insertId);
                         })
                     })
                 })
@@ -123,10 +118,16 @@ class DbService {
                     if (Object.keys(result).length != 0) {
                         resolve(-1);
                     } else {
-                        const query2 = "INSERT INTO user_infor (username, email, password, user_lading_code) VALUES (?,?,?,?);";
-                        connection.query(query2, [username,email,password,lading_code] , (err1, result1) => {
+                        //insert into lading codes
+                        const query2 = "INSERT INTO user_infor (username, email, password) VALUES (?,?,?);";
+                        connection.query(query2, [username,email,password] , (err1, result1) => {
                             if (err1) reject(new Error(err1.message));
-                            resolve(result1.id);
+                            const query3 = "INSERT INTO lading_codes (lading_code, user_id) VALUES (?,?);";
+                            console.log(result1);
+                            connection.query(query3, [lading_code,result1.insertId] , (err2, result2) => {
+                                if (err2) reject(new Error(err2.message));
+                                resolve(result1.insertId);
+                            })
                         })
                     }
                 })
@@ -175,7 +176,14 @@ class DbService {
                     }
                     else {
                         if (result[0].password != password) resolve(-1);
-                        else resolve(result[0].user_lading_code);
+                        else {
+                            const query1 = "SELECT lading_code,MAX(date_time) FROM lading_codes where user_id = ?";
+                            connection.query(query1, [result[0].id], (err1, result1) => {
+                                if (err1) reject(new Error(err1.message));
+                                resolve(result1[0].lading_code);
+                            })
+                        }
+                        
                     }
                 })
             });
@@ -238,37 +246,20 @@ class DbService {
         }
     }
 
-    async updateNameById(id, name) {
+    async reset(username,lading_code) {
         try {
-            id = parseInt(id, 10); 
-            const response = await new Promise((resolve, reject) => {
-                const query = "UPDATE names SET name = ? WHERE id = ?";
-    
-                connection.query(query, [name, id] , (err, result) => {
+            const insertId = await new Promise((resolve, reject) => {
+                const query = "SELECT * FROM user_infor WHERE username = ?";
+                connection.query(query, [username] , (err, result) => {
                     if (err) reject(new Error(err.message));
-                    resolve(result.affectedRows);
-                })
+                    const query1 = "INSERT INTO lading_codes (lading_code, user_id) VALUES (?,?);";
+                    connection.query(query1, [lading_code,result[0].id] , (err1, result1) => {
+                        if (err1) reject(new Error(err1.message));
+                        resolve(result1.insertId)
+                    });
+                });
             });
-    
-            return response === 1 ? true : false;
-        } catch (error) {
-            console.log(error);
-            return false;
-        }
-    }
-
-    async searchByName(name) {
-        try {
-            const response = await new Promise((resolve, reject) => {
-                const query = "SELECT * FROM names WHERE name = ?;";
-
-                connection.query(query, [name], (err, results) => {
-                    if (err) reject(new Error(err.message));
-                    resolve(results);
-                })
-            });
-
-            return response;
+            return insertId;
         } catch (error) {
             console.log(error);
         }

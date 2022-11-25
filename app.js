@@ -80,6 +80,14 @@ app.post('/pay', (req,res)=>{
     .then(data => res.json({ data: data}))
     .catch(err => console.log(err));
 });
+app.post('/resetCode', (req,res)=>{
+    const db = dbService.getDbServiceInstance();
+    const { username,lading_code } = req.body;
+    const result = db.reset(username,lading_code);
+    result
+    .then(data => res.json({ data: data}))
+    .catch(err => console.log(err));
+});
 //update
 
 //delete

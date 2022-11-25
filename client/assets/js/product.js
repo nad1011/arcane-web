@@ -202,8 +202,18 @@ cartBtn.onclick = function() {
                     .then(res => res.json())
                     .then(data => {
                         setData(window.localStorage.getItem('username'),Math.random().toString(36).slice(2, 12));
+                        fetch('http://localhost:5000/resetCode', {
+                            headers: {
+                                'Content-type': 'application/json'
+                            },
+                            method: 'POST',
+                            body: JSON.stringify({
+                                username:  window.localStorage.getItem('username'),
+                                lading_code: window.localStorage.getItem(window.localStorage.getItem('username'))
+                            })
+                        })
                         alert("Your order will be delivered quickly");
-                        location.reload()
+                        location.reload();
                     })
                 }
             })
